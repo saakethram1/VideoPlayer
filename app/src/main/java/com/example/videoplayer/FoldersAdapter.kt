@@ -30,6 +30,7 @@ class FoldersAdapter(private val context: Context, private var foldersList: Arra
             val intent=Intent(context,FoldersActivity::class.java)
             intent.putExtra("position",position)
             ContextCompat.startActivity(context,intent,null)
+
         }
     }
 

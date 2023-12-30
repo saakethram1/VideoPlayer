@@ -2,18 +2,32 @@ package com.example.videoplayer
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
+import android.view.LayoutInflater
 import android.view.MenuItem
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
+import com.example.videoplayer.com.example.videoplayer.CustomPagerAdapter
 import com.example.videoplayer.databinding.ActivityMainBinding
+import com.example.videoplayer.databinding.MoreFeaturesBinding
+import com.example.videoplayer.databinding.ThemeViewBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -22,14 +36,36 @@ class MainActivity : AppCompatActivity() {
    private lateinit var binding: ActivityMainBinding
      private lateinit var toggle:ActionBarDrawerToggle
 
+    private var runnable: Runnable? = null
+    private lateinit var currentFragment:Fragment
+
     companion object{
+
         lateinit var videoList:ArrayList<Video>
         lateinit var folderList: ArrayList<Folder>
+        lateinit var searchList:ArrayList<Video>
+        var search:Boolean=false
+        var themeIndex:Int=0
+         var sortValue:Int=0
+        val themeList= arrayOf(R.style.coolPinkNav,R.style.coolBlueNav,R.style.coolpurpleNav,R.style.coolGreenNav,R.style.coolredNav,R.style.coolBlackNav)
+        var dataChanged:Boolean=false
+        var adapterChanged: Boolean = false
+         val sortList = arrayOf(
+            MediaStore.Video.Media.DATE_ADDED + " DESC",
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.TITLE,
+            MediaStore.Video.Media.TITLE + " DESC",
+            MediaStore.Video.Media.SIZE,
+            MediaStore.Video.Media.SIZE + " DESC"
+        )
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val editor=getSharedPreferences("Themes", MODE_PRIVATE)
+       themeIndex= editor.getInt("themeIndex",0)
+        setTheme(themeList[themeIndex])
         binding= ActivityMainBinding.inflate(layoutInflater)
-        setTheme(R.style.coolPinkNav)
         setContentView(binding.root)
 
         //for nav drawer
@@ -40,11 +76,34 @@ class MainActivity : AppCompatActivity() {
 
          if(requestRuntimePermission()){
              folderList= ArrayList()
-             videoList=getAllVideos()
-             setFragment(VideosFragment())
+             videoList=getAllVideos(this)
+            setFragment(VideosFragment())
+             runnable = Runnable {
+                if (dataChanged) {
+                    videoList = getAllVideos(this)
+                    dataChanged = false
+                    adapterChanged = true
+                }
+            if(runnable!=null)  Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
          }
 
+//        val viewPager: ViewPager = findViewById(R.id.viewPager)
+//        val adapter = CustomPagerAdapter(supportFragmentManager)
+//        viewPager.adapter = adapter
+
+//        binding.bottomNav.setOnNavigationItemSelectedListener { menuItem ->
+//            if(dataChanged) videoList=getAllVideos(this)
+//            when (menuItem.itemId) {
+//
+//                R.id.videoView -> viewPager.currentItem = 0 // Set the index for the video fragment
+//                R.id.foldersView -> viewPager.currentItem = 1 // Set the index for the folders fragment
+//            }
+//            true
+//        }
        binding.bottomNav.setOnItemSelectedListener {
+          // if(dataChanged) videoList=getAllVideos()
            when(it.itemId){
                R.id.videoView->setFragment(VideosFragment())
                R.id.foldersView->setFragment(FoldersFragment())
@@ -53,18 +112,69 @@ class MainActivity : AppCompatActivity() {
        }
         binding.navView.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.feedbackNav->Toast.makeText(this,"Feedback",Toast.LENGTH_SHORT).show()
-                R.id.themesNav->Toast.makeText(this,"Themes",Toast.LENGTH_SHORT).show()
-                R.id.sortOrderNav->Toast.makeText(this,"Sort Order",Toast.LENGTH_SHORT).show()
-                R.id.aboutNav->Toast.makeText(this,"About",Toast.LENGTH_SHORT).show()
+
+                R.id.themesNav->{
+                    val customDialog=
+                        LayoutInflater.from(this).inflate(R.layout.theme_view,binding.root,false)
+                    val bindingTV= ThemeViewBinding.bind(customDialog)
+                    val dialog= MaterialAlertDialogBuilder(this).setView(customDialog)
+                        .setTitle("Select Theme")
+                        .create()
+                    dialog.show()
+                    when(themeIndex){
+                        0->bindingTV.themePink.setBackgroundColor(Color.YELLOW)
+                        1->bindingTV.themeBlue.setBackgroundColor(Color.YELLOW)
+                        2->bindingTV.themePurple.setBackgroundColor(Color.YELLOW)
+                        3->bindingTV.themeGreen.setBackgroundColor(Color.YELLOW)
+                        4->bindingTV.themeRed.setBackgroundColor(Color.YELLOW)
+                        5->bindingTV.themeBlack.setBackgroundColor(Color.YELLOW)
+                    }
+                    bindingTV.themePink.setOnClickListener { saveTheme(0)}
+                    bindingTV.themeBlue.setOnClickListener { saveTheme(1)}
+                    bindingTV.themePurple.setOnClickListener {saveTheme(2)}
+                    bindingTV.themeGreen.setOnClickListener {saveTheme(3)}
+                    bindingTV.themeRed.setOnClickListener {saveTheme(4)}
+                    bindingTV.themeBlack.setOnClickListener {saveTheme(5)}
+                }
+                R.id.sortOrderNav->{
+                    val menuItems = arrayOf(
+                        "Latest",
+                        "Oldest",
+                        "Name(A to Z)",
+                        "Name(Z to A)",
+                        "File Size(Smallest)",
+                        "File Size(Largest)"
+                    )
+                    var value = sortValue
+                    val dialog = MaterialAlertDialogBuilder(this)
+                        .setTitle("Sort By")
+                        .setPositiveButton("OK") { _, _ ->
+                            val sortEditor = getSharedPreferences("Sorting", MODE_PRIVATE).edit()
+                            sortEditor.putInt("sortValue", value)
+                            sortEditor.apply()
+
+                            //for restarting app
+                            finish()
+                            startActivity(intent)
+                        }
+                        .setSingleChoiceItems(menuItems, sortValue) { _, pos ->
+                            value = pos
+                        }
+                        .create()
+                    dialog.show()
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED)
+
+                }
+                R.id.aboutNav->startActivity(Intent(this,AboutActivity::class.java))
                 R.id.exitNav-> exitProcess(1)
-
-
             }
             return@setNavigationItemSelectedListener true
         }
+//        val viewPager: ViewPager = findViewById(R.id.viewPager)
+
     }
     private fun setFragment(fragment: Fragment){
+        currentFragment=fragment
         val transaction=supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentFL,fragment)
         transaction.disallowAddToBackStack()
@@ -85,82 +195,41 @@ class MainActivity : AppCompatActivity() {
             if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this,"Permission GRanted",Toast.LENGTH_SHORT).show()
                   folderList=ArrayList()
-                  videoList=getAllVideos()
-                 setFragment(VideosFragment())}
+                  videoList=getAllVideos(this)
+       setFragment(VideosFragment())
+            }
         else
                 ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE),13)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val gradientList = arrayOf(R.drawable.pink_gradient,R.drawable.blue_gradient,R.drawable.purple_gradient,R.drawable.green_gradient,
+            R.drawable.red_gradient,R.drawable.black_gradient)
+        findViewById<LinearLayout>(R.id.gradientlayout).setBackgroundResource(gradientList[themeIndex])
+
         if(toggle.onOptionsItemSelected(item))
             return true
         return super.onOptionsItemSelected(item)
     }
-    @SuppressLint("InLinedApi","Recycle")
-   private fun getAllVideos():ArrayList<Video>{
-        val tempList = ArrayList<Video>()
-        val tempFolderList=ArrayList<String>()
-        val projection = arrayOf(
-            MediaStore.Video.Media.TITLE,
-            MediaStore.Video.Media.SIZE,
-            MediaStore.Video.Media._ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Video.Media.DATA,
-            MediaStore.Video.Media.DATE_ADDED,
-            MediaStore.Video.Media.DURATION,
-            MediaStore.Video.Media.BUCKET_ID
-        )
-        val cursor = this.contentResolver.query(
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            null,
-            null,
-            MediaStore.Video.Media.DATE_ADDED + " DESC"
-        )
-        cursor?.use { // Use cursor in a safe manner using the use function to auto-close it
-            val titleColumnIndex = it.getColumnIndex(MediaStore.Video.Media.TITLE)
-            val idColumnIndex = it.getColumnIndex(MediaStore.Video.Media._ID)
-            val folderColumnIndex = it.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
-            val folderIdColumnIndex=it.getColumnIndex(MediaStore.Video.Media.BUCKET_ID)
-            val sizeColumnIndex = it.getColumnIndex(MediaStore.Video.Media.SIZE)
-            val pathColumnIndex = it.getColumnIndex(MediaStore.Video.Media.DATA)
-            val durationColumnIndex = it.getColumnIndex(MediaStore.Video.Media.DURATION)
 
-            while (it.moveToNext()) {
-                val titleC = if (titleColumnIndex != -1) it.getString(titleColumnIndex) else ""
-                val idC = if (idColumnIndex != -1) it.getString(idColumnIndex) else ""
-                val folderC = if (folderColumnIndex != -1) it.getString(folderColumnIndex) else ""
-                val folderIdC=if (folderIdColumnIndex!=-1) it.getString(folderIdColumnIndex) else ""
-                val sizeC = if (sizeColumnIndex != -1) it.getString(sizeColumnIndex) else ""
-                val pathC = if (pathColumnIndex != -1) it.getString(pathColumnIndex) else ""
-                val durationC = if (durationColumnIndex != -1) it.getString(durationColumnIndex)?.toLong()
-                    ?: 0L else 0L
+    private fun saveTheme(index:Int){
+        val editor=getSharedPreferences("Themes", MODE_PRIVATE).edit()
+        editor.putInt("themeIndex",index)
+        editor.apply()
+      //for restarting app
+        finish()
+        startActivity(intent)
 
-                try {
-                    val file = File(pathC)
-                    if (file.exists()) {
-                        val artUriC = Uri.fromFile(file)
-                        val video = Video(
-                            title = titleC,
-                            id = idC,
-                            folderName = folderC,
-                            duration = durationC,
-                            size = sizeC,
-                            path = pathC,
-                            artUri = artUriC
-                        )
-                        tempList.add(video)
-                    }
-                    //for adding folders
-                    if(!tempFolderList.contains(folderC)){
-                        tempFolderList.add(folderC)
-                        folderList.add(Folder(id=folderIdC, folderName = folderC))
-                    }
-                } catch (e: Exception) {
-                    // Handle the exception if necessary
-                }
-            }
-        }
-        return tempList
-   }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        runnable=null
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        (currentFragment as VideosFragment).adapter.onResult(requestCode,resultCode)
+    }
 }

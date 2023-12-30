@@ -4,13 +4,88 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerActivity">
+    tools:context=".PlayerActivity"
+    android:background="@color/black">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/playerView"
+<!--    <com.google.android.exoplayer2.ui.PlayerView-->
+<!--        android:id="@+id/playerView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:controller_layout_id="@layout/custom_view"-->
+<!--        app:use_controller="true"-->
+<!--        android:keepScreenOn="true"-->
+<!--        app:show_buffering="always"/>-->
+    
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:use_controller="true"
-        android:keepScreenOn="true"/>
+        android:layout_height="match_parent">
+        <com.github.vkay94.dtpv.DoubleTapPlayerView
+            android:id="@+id/playerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:controller_layout_id="@layout/custom_view"
+            android:background="@color/black"
+            app:dtpv_controller="@id/YtOverlay"
+            app:use_controller="true"
+            android:keepScreenOn="true"
+            app:show_buffering="always"/>
+        <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+            android:id="@+id/YtOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+           app:yt_playerView="@id/playerView"
+            app:use_controller="true"
+           android:background="#77000000"
+            android:visibility="invisible"/>
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/lockBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/lock_open_icon"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/lock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white"
+       />
+
+
+    <Button
+        android:id="@+id/brightnessIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+       android:drawableLeft="@drawable/brightness_icon"
+        android:text="@string/O"
+        tools:ignore="RtlHardcoded"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:background="#42000000"
+        android:visibility="gone"
+        />
+
+    <Button
+         android:id="@+id/volumeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:drawableLeft="@drawable/volume_icon"
+        android:text="@string/O"
+        tools:ignore="RtlHardcoded"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:background="#42000000"
+        android:visibility="gone"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

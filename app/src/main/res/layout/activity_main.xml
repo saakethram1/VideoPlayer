@@ -6,41 +6,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
- <androidx.appcompat.widget.LinearLayoutCompat
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:orientation="vertical">
-     <FrameLayout
-         android:id="@+id/fragmentFL"
-         android:layout_width="match_parent"
-         android:layout_height="0dp"
-         android:layout_weight="1"
-         />
-   <com.google.android.material.bottomnavigation.BottomNavigationView
-       android:id="@+id/bottomNav"
-       android:layout_width="match_parent"
-       android:layout_height="65dp"
-       app:menu="@menu/bottom_nav"
-       app:itemIconTint="@color/cool_pink"
-       android:backgroundTint="@color/white"
-       app:itemTextColor="@color/black"
-       app:itemTextAppearanceActive="@color/black"
-       app:itemTextAppearanceInactive="@android:color/darker_gray"/>
- </androidx.appcompat.widget.LinearLayoutCompat>
-<com.google.android.material.navigation.NavigationView
-    android:id="@+id/navView"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_gravity="start"
-    android:fitsSystemWindows="true"
-    app:menu="@menu/nav_menu"
-    app:headerLayout="@layout/nav_header"
-    android:background="@color/white"
-    app:itemTextColor="@color/black"
-    app:itemIconTint="@color/cool_pink"/>
+    tools:context=".MainActivity"
+    android:id="@+id/drawerLayoutMA">
+
+    <!-- Main content container -->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+             <FrameLayout
+                 android:id="@+id/fragmentFL"
+                 android:layout_width="match_parent"
+                 android:layout_height="0dp"
+                 android:layout_weight="1"
+                 />
 
 
 
+        <!-- Bottom Navigation View -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/white"
+            app:itemIconTint="?attr/themeColor"
+            app:itemTextColor="@color/black"
+            app:menu="@menu/bottom_nav"
+            app:itemTextAppearanceActive="@color/black"
+            app:itemTextAppearanceInactive="@android:color/darker_gray"/>
+
+    </LinearLayout>
+
+    <!-- Navigation Drawer -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/nav_menu"
+        app:headerLayout="@layout/nav_header"
+        android:background="@android:color/white"
+        app:itemTextColor="@color/black"
+        app:itemIconTint="?attr/themeColor"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

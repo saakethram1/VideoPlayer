@@ -12,8 +12,89 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
     </style>
+    <attr name="themeColor" format="color"/>
+//custom theme
 
     <style name="coolPinkNav" parent="Theme.MaterialComponents.Light">
+       <item name="themeColor">@color/cool_pink</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/cool_pink</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">@color/cool_pink</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+    <style name="coolBlueNav" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@color/cool_blue</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">?attr/themeColor</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+    <style name="coolGreenNav" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@color/cool_green</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">?attr/themeColor</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+    <style name="coolpurpleNav" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@color/purple_700</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">?attr/themeColor</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+    <style name="coolredNav" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@android:color/holo_red_dark</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">?attr/themeColor</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+    <style name="coolBlackNav" parent="Theme.MaterialComponents.Light">
+        <item name="themeColor">@color/black</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">?attr/themeColor</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorSecondary">?attr/themeColor</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/themeColor</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+
+
+
+
+
+    //for Player activity
+    <style name="PlayerActivityTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/cool_pink</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -24,7 +105,20 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
-
+//for dialog
+    <style name="alertdialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColor">@color/white</item>
+    </style>
+  <!-- Base application theme. -->
+    <style name="Base.Theme.VideoPlayer" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Customize positive button style -->
+        <item name="colorAccent">@color/white</item> <!-- Change text color -->
+        <!-- Add any other button customizations here if needed -->
+    </style>
 
 
 </resources>

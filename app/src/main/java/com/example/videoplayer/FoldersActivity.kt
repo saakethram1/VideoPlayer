@@ -1,6 +1,7 @@
 package com.example.videoplayer
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,14 +12,16 @@ import com.example.videoplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
 class FoldersActivity : AppCompatActivity() {
+    lateinit var adapter:VideoAdapter
       companion object {
           lateinit var currentFolderVideos: ArrayList<Video>
+
       }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding=ActivityFoldersBinding.inflate(layoutInflater)
-        setTheme(R.style.coolPinkNav)
+        setTheme(MainActivity.themeList[MainActivity.themeIndex])
         setContentView(binding.root)
 
 
@@ -30,7 +33,8 @@ class FoldersActivity : AppCompatActivity() {
         binding.videoRVFA.setHasFixedSize(true)
         binding.videoRVFA.setItemViewCacheSize(10)
         binding.videoRVFA.layoutManager= LinearLayoutManager(this@FoldersActivity)
-        binding.videoRVFA.adapter=VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true)
+        adapter=VideoAdapter(this@FoldersActivity,currentFolderVideos, isFolder = true)
+        binding.videoRVFA.adapter=adapter
         binding.totalVideosFA.text="Total Videos:${currentFolderVideos.size}"
 
     }
@@ -100,5 +104,9 @@ class FoldersActivity : AppCompatActivity() {
             }
         }
         return tempList
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        adapter.onResult(requestCode,resultCode)
     }
 }
